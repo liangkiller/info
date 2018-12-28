@@ -1,0 +1,55 @@
+    <?php
+    date_default_timezone_set('PRC');
+    header("Content-type:text/html;charset=utf-8");
+    set_time_limit(0);
+    ob_end_clean();
+    ob_implicit_flush(1);
+    ini_set("display_errors", "On");
+    error_reporting(E_ALL | E_STRICT);
+    $path = dirname(__FILE__);
+    $txtPath = $path.DIRECTORY_SEPARATOR."txt";
+    $resPath = $path.DIRECTORY_SEPARATOR."res";
+    $windowsHost = "C:".DIRECTORY_SEPARATOR."Windows".DIRECTORY_SEPARATOR."System32".DIRECTORY_SEPARATOR."drivers".DIRECTORY_SEPARATOR."etc".DIRECTORY_SEPARATOR."hosts";
+    include($path.DIRECTORY_SEPARATOR."function.php");
+    $enclose='"';
+    $csv_sep='","';
+    $sep=";";
+    $domains=array(
+        "www.google.com",
+        "www.google.com.hk"
+    );
+    $url = "https://mxtoolbox.com/Public/Lookup.aspx/DoLookup2";
+    $host = "";
+    foreach ($domains as $domain) {
+        echo "开始获取:".$domain." 的ipv6<br/>\n";
+        $headerArr=array(
+            "Accept:application/json, text/javascript, */*; q=0.01",
+            "User-Agent:Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0",
+            "Accept-Language:zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+            "Accept-Encoding:gzip,deflate,br",
+            "Content-Type:application/json; charset=utf-8",
+            "Referer:https://mxtoolbox.com/SuperTool.aspx?action=aaaa%3a".$domain."&run=toolpage",
+            "Connection:keep-alive",
+        );
+        $curlPost = json_encode(array(
+            'inputText'=>"aaaa:$domain",
+            'resultIndex'=>'2',
+        ));
+        $resObj = curl_post($url,$curlPost,$headerArr);
+        $resContent = object_array($resObj)['d'];
+        $aaaaPattern  =  '#ptr:(.*)\\\u0027,#smU';
+        preg_match($aaaaPattern, $resContent,$res);
+        $ipv6 = $res[1];
+        echo $domain." 的ipv6地址是:".$ipv6." 加入hosts<br/>\n";
+        $host .= $ipv6." ".$domain."\r\n";
+    }
+    if(file_exists("hosts")) {
+        unlink("hosts");
+    }
+    copy("hosts.ori","hosts");
+    file_put_contents("hosts",$host,FILE_APPEND);
+    if(file_exists($windowsHost)) {
+        unlink($windowsHost);
+        copy("hosts",$windowsHost);
+        echo "加入完成<br/>\n";
+    }
