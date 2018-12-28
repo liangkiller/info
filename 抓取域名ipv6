@@ -7,8 +7,7 @@
     ini_set("display_errors", "On");
     error_reporting(E_ALL | E_STRICT);
     $path = dirname(__FILE__);
-    $txtPath = $path.DIRECTORY_SEPARATOR."txt";
-    $resPath = $path.DIRECTORY_SEPARATOR."res";
+
     $windowsHost = "C:".DIRECTORY_SEPARATOR."Windows".DIRECTORY_SEPARATOR."System32".DIRECTORY_SEPARATOR."drivers".DIRECTORY_SEPARATOR."etc".DIRECTORY_SEPARATOR."hosts";
     include($path.DIRECTORY_SEPARATOR."function.php");
     $enclose='"';
