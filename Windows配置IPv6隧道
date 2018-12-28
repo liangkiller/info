@@ -1,0 +1,70 @@
+清空隧道配置:
+
+    netsh interface ipv6 set teredo disable
+    netsh interface ipv6 6to4 set state disable
+    netsh interface ipv6 isatap set state disable
+
+Teredo:
+
+可以穿越NAT通过将IPv6数据包封装在UDP中访问IPv6网络
+公共Teredo服务器地址列表：
+
+    teredo.remlab.net / teredo-debian.remlab.net (法国) (Miredo 默认设置)
+    teredo.autotrans.consulintel.com (西班牙)
+    teredo.ipv6.microsoft.com (美国 雷蒙德) (Windows XP/2003/Vista/7/2008 系统默认设置)
+    teredo.ngix.ne.kr (韩国)
+    teredo.managemydedi.com (美国 芝加哥)
+
+很给力的teredo隧道
+http://ju.outofmemory.cn/entry/94277
+
+设置方法：
+
+    netsh interface ipv6 set teredo enterpriseclient teredo-debian.remlab.net. 60 34567
+
+检查状态：
+
+    netsh interface ipv6 show teredo
+    Teredo Parameters
+    ---------------------------------------------
+    Type                    : enterpriseclient
+    Server Name             : teredo-debian.remlab.net.
+    Client Refresh Interval : 60 seconds
+    Client Port             : 34567
+    State                   : qualified
+    Client Type             : teredo client
+    Network                 : managed
+    NAT                     : symmetric (address)
+    NAT Special Behaviour   : UPNP: Yes, PortPreserving: Yes
+    Local Mapping           : 192.168.1.103:34567
+    External NAT Mapping    : 49.75.31.52:34567
+
+若“ 状态 ”为 dormant / qualified ，则表示已连接服务器并获得 IPv6 地址
+若“ 状态 ”为 offline ，同时提示错误“无法访问主服务器地址”或其他错误，则表示未连接上服务器
+
+dormant 意思是teredo休眠了,ping -6 ipv6.jmu.edu.cn
+
+ipconfig
+找到 Tunnel adpter （隧道适配器） Teredo Tunneling Pseudo-Interface ， 查看它是否有正确的 IPv6 地址 （ 以 2001:0 为前缀的 ipv6 地址 ），若有说明正确；
+
+teredo方式的访问
+要获先域名的ipv6地址，加入hosts
+
+启动ip helper 服务
+组策略开启teredo
+gpedit.msc->计算机配置->管理模板->网络->tcp/ip设置->IPV6转换技术->ISATAP状态(已启用)
+->Teredo状态(已启用)
+
+ipconfig 查看本机ipv6
+ping -6 本机ipv6
+
+测试
+www.kame.net
+http://ipv6.tc.edu.tw/
+
+解析
+https://mxtoolbox.com/IPv6.aspx
+https://en.mk/dns/
+
+在线测试
+http://ipv6now.com.au/pingme.php
